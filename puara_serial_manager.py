@@ -25,7 +25,7 @@ import serial
 import serial.tools.list_ports
 
 # Local libraries
-from .wired import tstick, tstick_serial, tstick_osc
+from wired import tstick, tstick_serial, tstick_osc
 
 BAUDRATE = 115200
 READ_TIMEOUT_SECS = 5.0
