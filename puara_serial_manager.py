@@ -160,7 +160,7 @@ class SerialManager:
                 device.ser.write(b'reboot')
                 device.ser.close()
         except:
-            fo.write(f"Serial Error {device}\n");
+            fo.write(f"Serial Error {device}\n")
             fo.flush()
 
     def wait_for_device_ready(self, device: Device):
