@@ -106,12 +106,12 @@ class SerialManager:
                     ser.port, ser.baudrate, ser.timeout = port.device, BAUDRATE, READ_TIMEOUT_SECS
                     device = Device(device_id, ser)
                     self.devices[device_id] = device
-                    fo.write(f'found new serial device {device}\n')
+                    fo.write(f'Found {device}\n')
                     fo.flush()
                     try:
                         ser.open()
                     except serial.SerialException as e:
-                        fo.write(f"Couldn't open serial device {device}, got error {e}\n")
+                        fo.write(f"Error {device}\n")
                         fo.flush()
                     threading.Thread(target=self.configure_device, args=[device]).start()
             sleep(1)
@@ -121,17 +121,17 @@ class SerialManager:
                     ssid=self.wifi.ssid, psk=self.wifi.psk)
 
     def configure_device(self, device: Device):
-        fo.write(f'waiting for {device} to become ready...\n')
+        fo.write(f'Waiting {device}\n')
         fo.flush()
         self.wait_for_device_ready(device)
-        fo.write(f'{device} ready.\n')
+        fo.write(f'Ready {device}\n')
         fo.flush()
         if device.name is None:
             name = self.get_device_name(device)
             device = device.named_device(name)
-            fo.write(f'{device.device_id} is {device.name}\n')
+            fo.write(f'Name {device.device_id} is {device.name}\n')
             fo.flush()
-        fo.write(f'getting config data from {device}\n')
+        fo.write(f'Reading {device}\n')
         fo.flush()
         config_data = self.get_config_data(device)
         config_json = json.loads(config_data)
@@ -144,17 +144,17 @@ class SerialManager:
         for k, desired_v in desired_json.items():
             if not config_json[k] == desired_v:
                 needs_config = True
-                fo.write(f'value of {k} does not match | desired: "{desired_v}" device: "{config_json[k]}"\n')
-                fo.flush()
+                # fo.write(f'value of {k} does not match | desired: "{desired_v}" device: "{config_json[k]}"\n')
+                # fo.flush()
         if needs_config:
-            fo.write(f'configuring {device}\n')
+            fo.write(f'Configuring {device}\n')
             fo.flush()
             device.ser.write(f'sendconfig {json.dumps(desired_json)}'.encode('utf-8'))
             # TODO(p42ul): Replace this with an ACK from the device side.
             sleep(3)
             device.ser.write(b'writeconfig')
             sleep(3)
-            fo.write(f'{device} has been successfully configured. rebooting to initialize config\n')
+            fo.write(f'Success {device}\n')
             fo.flush()
             device.ser.write(b'reboot')
             device.ser.close()
